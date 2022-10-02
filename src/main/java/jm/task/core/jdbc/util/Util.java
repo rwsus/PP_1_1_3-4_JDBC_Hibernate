@@ -13,11 +13,10 @@ public class Util {
             ClassNotFoundException {
         Properties properties = new Properties();
 
-        try (InputStream in = Files.newInputStream(Paths.get("database.properties"))) {
+        try (InputStream in = Files.newInputStream(Paths.get("src/main/resources/database.properties"))) {
             properties.load(in);
         } catch (IOException e) {
-            System.err.println("Can't get login db properties");
-            throw new RuntimeException();
+            throw new RuntimeException(e);
         }
 
         String hostName = properties.getProperty("hostName");

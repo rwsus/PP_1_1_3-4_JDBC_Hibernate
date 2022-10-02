@@ -30,19 +30,16 @@ public class UserDaoJDBCImpl implements UserDao {
         }
         try {
             statement = connection.createStatement();
-            statement.execute(
-                    "CREATE TABLE users ('id' BIGINT PRIMARY KEY AUTO_INCREMENT, 'name' VARCHAR(64), " +
-                        "'lastname' VARCHAR(64), 'age' TINYINT);");
-
-
-        connection.commit();
+            String sql = "CREATE TABLE IF NOT EXISTS users (id BIGINT PRIMARY KEY AUTO_INCREMENT, " +
+                    "name VARCHAR(64), lastname VARCHAR(64), age TINYINT);";
+            statement.executeUpdate(sql);
+            connection.commit();
 
         } catch (SQLException e) {
             Util.rollbackQuietly(connection);
             throw new RuntimeException(e);
 
         } finally {
-            Util.closeQuietly(resultSet);
             Util.closeQuietly(statement);
             Util.closeQuietly(connection);
         }
@@ -59,10 +56,7 @@ public class UserDaoJDBCImpl implements UserDao {
         }
         try {
             statement = connection.createStatement();
-            statement.execute(
-                    "DROP TABLE users;");
-
-
+            statement.executeUpdate("DROP TABLE IF EXISTS users");
             connection.commit();
 
         } catch (SQLException e) {
@@ -70,7 +64,6 @@ public class UserDaoJDBCImpl implements UserDao {
             throw new RuntimeException(e);
 
         } finally {
-            Util.closeQuietly(resultSet);
             Util.closeQuietly(statement);
             Util.closeQuietly(connection);
         }
@@ -78,11 +71,57 @@ public class UserDaoJDBCImpl implements UserDao {
     }
 
     public void saveUser(String name, String lastName, byte age) {
+        User user = new User(name, lastName, age);
+        try {
+            connection = Util.getMySQLConnection();
+
+        } catch (SQLException | ClassNotFoundException e) {
+            System.err.println("Something wrong with connection to database");
+            throw new RuntimeException(e);
+        }
+        try {
+            statement = connection.createStatement();
+            String sql = "INSERT INTO users (name, lastname, age) VALUES ('" + user.getName() + "', '" +
+                    user.getLastName() + "', " + user.getAge() + ");";
+            statement.executeUpdate(sql);
+            connection.commit();
+            System.out.println("User с именем – " + name + " добавлен в базу данных");
+
+        } catch (SQLException e) {
+            Util.rollbackQuietly(connection);
+            throw new RuntimeException(e);
+
+        } finally {
+            Util.closeQuietly(statement);
+            Util.closeQuietly(connection);
+        }
 
     }
 
     public void removeUserById(long id) {
+        User user = new User();
+        user.setId(id);
+        try {
+            connection = Util.getMySQLConnection();
 
+        } catch (SQLException | ClassNotFoundException e) {
+            System.err.println("Something wrong with connection to database");
+            throw new RuntimeException(e);
+        }
+        try {
+            statement = connection.createStatement();
+            String sql = "DELETE FROM users WHERE id = " + user.getId();
+            statement.executeUpdate(sql);
+            connection.commit();
+
+        } catch (SQLException e) {
+            Util.rollbackQuietly(connection);
+            throw new RuntimeException(e);
+
+        } finally {
+            Util.closeQuietly(statement);
+            Util.closeQuietly(connection);
+        }
     }
 
     public List<User> getAllUsers() {
@@ -118,10 +157,29 @@ public class UserDaoJDBCImpl implements UserDao {
             Util.closeQuietly(resultSet);
             Util.closeQuietly(statement);
             Util.closeQuietly(connection);
-       }
+        }
     }
 
     public void cleanUsersTable() {
+        try {
+            connection = Util.getMySQLConnection();
 
+        } catch (SQLException | ClassNotFoundException e) {
+            System.err.println("Something wrong with connection to database");
+            throw new RuntimeException(e);
+        }
+        try {
+            statement = connection.createStatement();
+            statement.executeUpdate("DELETE FROM users");
+            connection.commit();
+
+        } catch (SQLException e) {
+            Util.rollbackQuietly(connection);
+            throw new RuntimeException(e);
+
+        } finally {
+            Util.closeQuietly(statement);
+            Util.closeQuietly(connection);
+        }
     }
 }
