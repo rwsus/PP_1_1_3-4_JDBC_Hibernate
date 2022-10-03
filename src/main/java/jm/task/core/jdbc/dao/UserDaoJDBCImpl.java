@@ -43,17 +43,12 @@ public class UserDaoJDBCImpl implements UserDao {
     public void dropUsersTable() {
         try {
             connection = Util.getMySQLConnection();
-
-        } catch (SQLException | ClassNotFoundException e) {
-            System.err.println("Something wrong with connection to database");
-            throw new RuntimeException(e);
-        }
-        try {
             statement = connection.createStatement();
             statement.executeUpdate("DROP TABLE IF EXISTS users");
             connection.commit();
 
-        } catch (SQLException e) {
+        } catch (SQLException | ClassNotFoundException e) {
+            System.err.println("Something wrong with connection to database");
             Util.rollbackQuietly(connection);
             throw new RuntimeException(e);
 
