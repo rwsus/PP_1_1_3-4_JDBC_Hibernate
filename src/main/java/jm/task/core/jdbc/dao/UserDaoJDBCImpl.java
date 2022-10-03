@@ -23,19 +23,13 @@ public class UserDaoJDBCImpl implements UserDao {
     public void createUsersTable() {
         try {
             connection = Util.getMySQLConnection();
+            statement = connection.createStatement();
+            statement.executeUpdate("CREATE TABLE IF NOT EXISTS users (id BIGINT PRIMARY KEY AUTO_INCREMENT, " +
+                    "name VARCHAR(64), lastname VARCHAR(64), age TINYINT);");
+            connection.commit();
 
         } catch (SQLException | ClassNotFoundException e) {
             System.err.println("Something wrong with connection to database");
-            throw new RuntimeException(e);
-        }
-        try {
-            statement = connection.createStatement();
-            String sql = "CREATE TABLE IF NOT EXISTS users (id BIGINT PRIMARY KEY AUTO_INCREMENT, " +
-                    "name VARCHAR(64), lastname VARCHAR(64), age TINYINT);";
-            statement.executeUpdate(sql);
-            connection.commit();
-
-        } catch (SQLException e) {
             Util.rollbackQuietly(connection);
             throw new RuntimeException(e);
 
@@ -74,20 +68,14 @@ public class UserDaoJDBCImpl implements UserDao {
         User user = new User(name, lastName, age);
         try {
             connection = Util.getMySQLConnection();
-
-        } catch (SQLException | ClassNotFoundException e) {
-            System.err.println("Something wrong with connection to database");
-            throw new RuntimeException(e);
-        }
-        try {
             statement = connection.createStatement();
-            String sql = "INSERT INTO users (name, lastname, age) VALUES ('" + user.getName() + "', '" +
-                    user.getLastName() + "', " + user.getAge() + ");";
-            statement.executeUpdate(sql);
+            statement.executeUpdate("INSERT INTO users (name, lastname, age) VALUES ('" + user.getName() + "', '" +
+                    user.getLastName() + "', " + user.getAge() + ");");
             connection.commit();
             System.out.println("User с именем – " + name + " добавлен в базу данных");
 
-        } catch (SQLException e) {
+        } catch (SQLException | ClassNotFoundException e) {
+            System.err.println("Something wrong with connection to database");
             Util.rollbackQuietly(connection);
             throw new RuntimeException(e);
 
@@ -103,18 +91,12 @@ public class UserDaoJDBCImpl implements UserDao {
         user.setId(id);
         try {
             connection = Util.getMySQLConnection();
+            statement = connection.createStatement();
+            statement.executeUpdate("DELETE FROM users WHERE id = " + user.getId());
+            connection.commit();
 
         } catch (SQLException | ClassNotFoundException e) {
             System.err.println("Something wrong with connection to database");
-            throw new RuntimeException(e);
-        }
-        try {
-            statement = connection.createStatement();
-            String sql = "DELETE FROM users WHERE id = " + user.getId();
-            statement.executeUpdate(sql);
-            connection.commit();
-
-        } catch (SQLException e) {
             Util.rollbackQuietly(connection);
             throw new RuntimeException(e);
 
@@ -129,12 +111,6 @@ public class UserDaoJDBCImpl implements UserDao {
 
         try {
             connection = Util.getMySQLConnection();
-
-        } catch (SQLException | ClassNotFoundException e) {
-            System.err.println("Something wrong with connection to database");
-            throw new RuntimeException(e);
-        }
-        try {
             statement = connection.createStatement();
             resultSet = statement.executeQuery("SELECT id, name, lastname, age FROM users;");
             while (resultSet.next()) {
@@ -149,7 +125,8 @@ public class UserDaoJDBCImpl implements UserDao {
             connection.commit();
             return userlist;
 
-        } catch (SQLException e) {
+        } catch (SQLException | ClassNotFoundException e) {
+            System.err.println("Something wrong with connection to database");
             Util.rollbackQuietly(connection);
             throw new RuntimeException(e);
 
@@ -163,17 +140,12 @@ public class UserDaoJDBCImpl implements UserDao {
     public void cleanUsersTable() {
         try {
             connection = Util.getMySQLConnection();
-
-        } catch (SQLException | ClassNotFoundException e) {
-            System.err.println("Something wrong with connection to database");
-            throw new RuntimeException(e);
-        }
-        try {
             statement = connection.createStatement();
             statement.executeUpdate("DELETE FROM users");
             connection.commit();
 
-        } catch (SQLException e) {
+        } catch (SQLException | ClassNotFoundException e) {
+            System.err.println("Something wrong with connection to database");
             Util.rollbackQuietly(connection);
             throw new RuntimeException(e);
 
