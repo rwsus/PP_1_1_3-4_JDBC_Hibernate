@@ -65,10 +65,9 @@ public class UserDaoHibernateImpl implements UserDao {
 
         try (Session session = Util.getSessionFactory().getCurrentSession()) {
             session.beginTransaction();
-            userList = session.createSQLQuery("SELECT *FROM users").getResultList();
+            userList = session.createQuery("FROM User").getResultList();
             session.getTransaction().commit();
         }
-
         return userList;
     }
 
@@ -76,7 +75,8 @@ public class UserDaoHibernateImpl implements UserDao {
     public void cleanUsersTable() {
         try (Session session = Util.getSessionFactory().getCurrentSession()) {
             session.beginTransaction();
-            session.createSQLQuery("TRUNCATE TABLE users");
+            session.createSQLQuery("TRUNCATE TABLE users")
+                    .executeUpdate();
             session.getTransaction().commit();
         }
 

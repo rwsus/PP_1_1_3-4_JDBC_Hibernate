@@ -56,7 +56,7 @@ public class Util {
             hiberprops.put(Environment.SHOW_SQL, "true");
             hiberprops.put(Environment.FORMAT_SQL, "true");
             hiberprops.put(Environment.CURRENT_SESSION_CONTEXT_CLASS, "thread");
-            hiberprops.put(Environment.HBM2DDL_AUTO, "create-drop");
+            hiberprops.put(Environment.HBM2DDL_AUTO, "");
             hiberprops.put(Environment.DEFAULT_SCHEMA, "dbForzad113");
             configuration.setProperties(hiberprops);
             configuration.addAnnotatedClass(User.class);
