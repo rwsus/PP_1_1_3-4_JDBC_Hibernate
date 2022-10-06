@@ -1,79 +1,75 @@
 package jm.task.core.jdbc.util;
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.nio.file.Files;
-import java.nio.file.Paths;
+import jm.task.core.jdbc.model.User;
+import org.hibernate.SessionFactory;
+import org.hibernate.boot.registry.StandardServiceRegistryBuilder;
+import org.hibernate.cfg.Configuration;
+import org.hibernate.cfg.Environment;
+import org.hibernate.service.ServiceRegistry;
+
 import java.sql.*;
 import java.util.Properties;
 
 public class Util {
-    // Connect to MySQL
-    public static Connection getMySQLConnection() throws SQLException,
-            ClassNotFoundException {
-        Properties properties = new Properties();
 
-        try (InputStream in = Files.newInputStream(Paths.get("src/main/resources/database.properties"))) {
-            properties.load(in);
-        } catch (IOException e) {
+    private static Util instance;       // make Util singleton
+    private static final String url = "jdbc:mysql://localhost:3306/dbForzad113";
+    private static final String username = "root";
+    private static final String pass = "mSql026335";
+    private static final String driver = "com.mysql.cj.jdbc.Driver";
+    private static SessionFactory sessionFactory;
+
+
+    private Util() {}
+
+    public static Util getInstance() {
+        if (instance == null) {
+            instance = new Util();
+        }
+        return instance;
+    }
+    // Connect to MySQL
+    public static Connection getMySQLConnection() {
+        try {
+            Class.forName(driver);
+            Connection connection = DriverManager.getConnection(url, username, pass);
+            connection.setTransactionIsolation(Connection.TRANSACTION_SERIALIZABLE);
+            connection.setAutoCommit(false);
+            return connection;
+        } catch (ClassNotFoundException | SQLException e) {
             throw new RuntimeException(e);
         }
-
-        String hostName = properties.getProperty("hostName");
-        String dbName = properties.getProperty("dbName");
-        String userName = properties.getProperty("userName");
-        String password = properties.getProperty("password");
-
-        Connection connection = getMySQLConnection(hostName, dbName, userName, password);
-        connection.setTransactionIsolation(Connection.TRANSACTION_SERIALIZABLE);
-        connection.setAutoCommit(false);
-        return connection;
     }
 
-    public static Connection getMySQLConnection(String hostName, String dbName,
-                                                String userName, String password) throws SQLException,
-            ClassNotFoundException {
+    //hibernate connection
 
-        Class.forName("com.mysql.cj.jdbc.Driver");
-        String connectionURL = "jdbc:mysql://" + hostName + ":3306/" + dbName;
-        return DriverManager.getConnection(connectionURL, userName,
-                password);
-    }
+    public static SessionFactory getSessionFactory() {
+        if (sessionFactory == null) {
+            Configuration configuration = new Configuration();
+            Properties hiberprops = new Properties();
 
-    public static void closeQuietly(Connection connection) {
-        if (connection != null) {
+            hiberprops.put(Environment.DRIVER, driver);
+            hiberprops.put(Environment.URL, url);
+            hiberprops.put(Environment.USER, username);
+            hiberprops.put(Environment.PASS, pass);
+            hiberprops.put(Environment.DIALECT, "org.hibernate.dialect.MySQLDialect");
+            hiberprops.put(Environment.SHOW_SQL, "true");
+            hiberprops.put(Environment.FORMAT_SQL, "true");
+            hiberprops.put(Environment.CURRENT_SESSION_CONTEXT_CLASS, "thread");
+            hiberprops.put(Environment.HBM2DDL_AUTO, "create-drop");
+            hiberprops.put(Environment.DEFAULT_SCHEMA, "dbForzad113");
+            configuration.setProperties(hiberprops);
+            configuration.addAnnotatedClass(User.class);
+
+            ServiceRegistry serviceRegistry = new StandardServiceRegistryBuilder()    // - is it necessary?
+                    .applySettings(configuration.getProperties()).build();
             try {
-                connection.close();
-            } catch (SQLException e) {
-                //NOP
+                sessionFactory = configuration.buildSessionFactory(serviceRegistry);
+            } catch (Exception e) {
+                StandardServiceRegistryBuilder.destroy(serviceRegistry);
+                throw new RuntimeException("Building sessionFactory failed");
             }
         }
-    }
-    public static void closeQuietly(Statement statement) {
-        if (statement != null) {
-            try {
-                statement.close();
-            } catch (SQLException e) {
-                //NOP
-            }
-        }
-    }
-    public static void closeQuietly(ResultSet resultSet) {
-        if (resultSet != null) {
-            try {
-                resultSet.close();
-            } catch (SQLException e) {
-                //NOP
-            }
-        }
-    }
-    public  static  void rollbackQuietly(Connection connection) {
-        if (connection != null) {
-            try {
-                connection.rollback();
-            } catch (SQLException e) {
-                //NOP
-            }
-        }
+        return sessionFactory;
     }
 }
