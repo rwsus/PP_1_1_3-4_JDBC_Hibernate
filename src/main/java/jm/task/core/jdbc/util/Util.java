@@ -61,10 +61,11 @@ public class Util {
             configuration.setProperties(hiberprops);
             configuration.addAnnotatedClass(User.class);
 
-            ServiceRegistry serviceRegistry = new StandardServiceRegistryBuilder()    // - is it necessary?
+            ServiceRegistry serviceRegistry = new StandardServiceRegistryBuilder()
                     .applySettings(configuration.getProperties()).build();
             try {
                 sessionFactory = configuration.buildSessionFactory(serviceRegistry);
+
             } catch (Exception e) {
                 StandardServiceRegistryBuilder.destroy(serviceRegistry);
                 throw new RuntimeException("Building sessionFactory failed");
