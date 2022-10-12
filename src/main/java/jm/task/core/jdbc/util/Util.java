@@ -12,7 +12,6 @@ import java.util.Properties;
 
 public class Util {
 
-    private static Util instance;       // make Util singleton
     private static final String url = "jdbc:mysql://localhost:3306/dbForzad113";
     private static final String username = "root";
     private static final String pass = "mSql026335";
@@ -22,12 +21,6 @@ public class Util {
 
     private Util() {}
 
-    public static Util getInstance() {
-        if (instance == null) {
-            instance = new Util();
-        }
-        return instance;
-    }
     // Connect to MySQL
     public static Connection getMySQLConnection() {
         try {
