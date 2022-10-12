@@ -19,7 +19,8 @@ public class Util {
     private static SessionFactory sessionFactory;
 
 
-    private Util() {}
+    private Util() {
+    }
 
     // Connect to MySQL
     public static Connection getMySQLConnection() {
@@ -47,14 +48,13 @@ public class Util {
             hiberprops.put(Environment.PASS, pass);
             hiberprops.put(Environment.DIALECT, "org.hibernate.dialect.MySQLDialect");
             hiberprops.put(Environment.SHOW_SQL, "true");
-            hiberprops.put(Environment.FORMAT_SQL, "true");
             hiberprops.put(Environment.CURRENT_SESSION_CONTEXT_CLASS, "thread");
-            hiberprops.put(Environment.HBM2DDL_AUTO, "create-drop");
+            hiberprops.put(Environment.HBM2DDL_AUTO, "none");
             hiberprops.put(Environment.DEFAULT_SCHEMA, "dbForzad113");
             configuration.setProperties(hiberprops);
             configuration.addAnnotatedClass(User.class);
 
-            ServiceRegistry serviceRegistry = new StandardServiceRegistryBuilder()    // - is it necessary?
+            ServiceRegistry serviceRegistry = new StandardServiceRegistryBuilder()
                     .applySettings(configuration.getProperties()).build();
             try {
                 sessionFactory = configuration.buildSessionFactory(serviceRegistry);
