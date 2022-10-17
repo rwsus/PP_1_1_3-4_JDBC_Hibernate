@@ -12,14 +12,22 @@ import java.util.Properties;
 
 public class Util {
 
+    private static Util instance;
     private static final String url = "jdbc:mysql://localhost:3306/dbForzad113";
     private static final String username = "root";
     private static final String pass = "mSql026335";
     private static final String driver = "com.mysql.cj.jdbc.Driver";
-    private static SessionFactory sessionFactory;
+    private SessionFactory sessionFactory;
 
 
     private Util() {
+    }
+
+    public static Util getInstance() {
+        if (instance == null) {
+            instance = new Util();
+        }
+        return instance;
     }
 
     // Connect to MySQL
@@ -37,7 +45,7 @@ public class Util {
 
     //hibernate connection
 
-    public static SessionFactory getSessionFactory() {
+    public SessionFactory getSessionFactory() {
         if (sessionFactory == null) {
             Configuration configuration = new Configuration();
             Properties hiberprops = new Properties();

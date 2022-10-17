@@ -10,7 +10,7 @@ import org.hibernate.Transaction;
 import java.util.List;
 
 public class UserDaoHibernateImpl implements UserDao {
-    private final SessionFactory sessionFactory = Util.getSessionFactory();
+    private final SessionFactory sessionFactory = Util.getInstance().getSessionFactory();
     private Session session;
     private Transaction transaction;
 
@@ -34,7 +34,9 @@ public class UserDaoHibernateImpl implements UserDao {
             }
             throw new RuntimeException(e);
         } finally {
-            session.close();
+            if (session != null) {
+                session.close();
+            }
         }
     }
 
@@ -53,7 +55,9 @@ public class UserDaoHibernateImpl implements UserDao {
             }
             throw new RuntimeException(e);
         } finally {
-            session.close();
+            if (session != null) {
+                session.close();
+            }
         }
     }
 
@@ -71,7 +75,9 @@ public class UserDaoHibernateImpl implements UserDao {
             }
             throw new RuntimeException(e);
         } finally {
-            session.close();
+            if (session != null) {
+                session.close();
+            }
         }
     }
 
@@ -91,7 +97,9 @@ public class UserDaoHibernateImpl implements UserDao {
             }
             throw new RuntimeException(e);
         } finally {
-            session.close();
+            if (session != null) {
+                session.close();
+            }
         }
     }
 
@@ -110,7 +118,9 @@ public class UserDaoHibernateImpl implements UserDao {
             }
             throw new RuntimeException(e);
         } finally {
-            session.close();
+            if (session != null) {
+                session.close();
+            }
         }
         return userList;
     }
@@ -129,7 +139,9 @@ public class UserDaoHibernateImpl implements UserDao {
             }
             throw new RuntimeException(e);
         } finally {
-            session.close();
+            if (session != null) {
+                session.close();
+            }
         }
     }
 }
